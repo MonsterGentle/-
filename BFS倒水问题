@@ -1,0 +1,164 @@
+/* hdu-1495 非常可乐 */
+
+#include <iostream>
+#include <queue>
+
+using namespace std;
+
+int S, N, M, k;
+bool vis[101][101][101];
+
+struct Node
+{
+	int s;
+	int n;
+	int m;
+	int num;
+};
+
+int BFS()
+{
+	queue<Node> q;
+	Node head;
+	head.s = S;
+	head.n = 0;
+	head.m = 0;
+	head.num = 0;
+	q.push(head);
+	while (!q.empty())
+	{
+		Node p;
+		p.m = 0;
+		p.n = 0;
+		p.s = 0;
+		p.num = 0;
+		Node tmp = q.front();
+		if ((tmp.m == tmp.n || tmp.n == tmp.s || tmp.s == tmp.m) && tmp.s != S && (!tmp.s || !tmp.n || !tmp.m))
+			return tmp.num;
+		q.pop();
+		if (tmp.s != 0)
+		{
+			//S->N
+			int ans = tmp.s - (N - tmp.n);
+			if (ans < 0)
+			{
+				p.num = tmp.num + 1;
+				p.m = tmp.m;
+				p.n = tmp.s + tmp.n;
+			}
+			else
+			{
+				p.num = tmp.num + 1;
+				p.m = tmp.m;
+				p.n = N;
+				p.s = ans;
+			}
+			if (!vis[p.s][p.n][p.m])
+			{
+				q.push(p);
+				vis[p.s][p.n][p.m] = 1;
+			}
+			//S->M
+			ans = tmp.s - (M - tmp.m);
+			if (ans < 0)
+			{
+				p.num = tmp.num + 1;
+				p.n = tmp.n;
+				p.m = tmp.m + tmp.s;
+			}
+			else
+			{
+				p.num = tmp.num + 1;
+				p.n = tmp.n;
+				p.m = M;
+				p.s = ans;
+			}
+			if (!vis[p.s][p.n][p.m])
+			{
+				q.push(p);
+				vis[p.s][p.n][p.m] = 1;
+			}
+		}
+		if (tmp.n != 0)
+		{
+			//N->S	
+			p.s = tmp.s + tmp.n;
+			p.n = 0;
+			p.m = tmp.m;
+			p.num = tmp.num + 1;
+			if (!vis[p.s][p.n][p.m])
+			{
+				q.push(p);
+				vis[p.s][p.n][p.m] = 1;
+			}
+			//N >> M
+			int ans = tmp.n - (M - tmp.m);
+			if (ans < 0)
+			{
+				p.m = tmp.m + tmp.n;
+				p.n = 0;
+				p.s = tmp.s;
+			}
+			else
+			{
+				p.m = M;
+				p.n = tmp.n - (M - tmp.m);
+				p.s = tmp.s;
+			}
+			p.num = tmp.num + 1;
+			if (!vis[p.s][p.n][p.m])
+			{
+				q.push(p);
+				vis[p.s][p.n][p.m] = 1;
+			}
+		}
+		if(tmp.m != 0)
+		{
+			//M->S
+			p.s = tmp.s + tmp.m;
+			p.m = 0;
+			p.num = tmp.num + 1;
+			p.n = tmp.n;
+			if (!vis[p.s][p.n][p.m])
+			{
+				q.push(p);
+				vis[p.s][p.n][p.m] = 1;
+			}
+			int ans = tmp.m - (N - tmp.n);
+			if (ans < 0)
+			{
+				p.m = 0;
+				p.n = tmp.n + tmp.m;
+				p.m = 0;
+				p.s = tmp.s;
+			}
+			else
+			{
+				p.n = N;
+				p.m = tmp.m - (N - tmp.n);
+				p.s = tmp.s;
+			}
+			p.num = tmp.num + 1;
+			if (!vis[p.s][p.n][p.m])
+			{
+				q.push(p);
+				vis[p.s][p.n][p.m] = 1;
+			}
+		}
+	}
+	return -1;
+}
+int main()
+{
+	while (cin >> S >> N >> M && N)
+	{
+		memset(vis, false, sizeof(vis));
+		vis[S][0][0] = 1;
+		int ans = BFS();
+		if (ans == -1)
+			cout << "NO" << endl;
+		else
+			cout << ans << endl;
+	}
+	return 0;
+}
