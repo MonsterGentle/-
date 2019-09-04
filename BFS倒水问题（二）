@@ -1,1 +1,168 @@
+/*POJ 3414 Pots*/
+#include <iostream>
+#include <queue>
+#include <vector>
 
+using namespace std;
+
+struct Node
+{
+	int a;
+	int b;
+	int num;
+	vector<string> path;
+};
+
+int A, B, C;
+bool vis[101][101];
+vector<string> A_ans;
+vector<string> B_ans;
+
+int BFS(Node first,vector<string> &v)
+{
+	queue<Node> q;
+	q.push(first);
+	while (!q.empty())
+	{
+		Node tmp = q.front();
+		if (tmp.a == C || tmp.b == C)
+		{
+			v = tmp.path;
+			return tmp.num;
+		}
+		q.pop();
+		Node second;
+		//FILL ONE
+		if (tmp.a != A && !vis[A][tmp.b])
+		{
+			vis[A][tmp.b] = 1;
+			second.a = A;
+			second.b = tmp.b;
+			second.num = tmp.num + 1;
+			second.path = tmp.path;
+			second.path.push_back("FILL(1)");
+			q.push(second);
+		}
+		if (tmp.b != B && !vis[tmp.a][B])
+		{
+			vis[tmp.a][B] = 1;
+			second.a = tmp.a;
+			second.b = B;
+			second.num = tmp.num + 1;
+			second.path = tmp.path;
+			second.path.push_back("FILL(2)");
+			q.push(second);
+		}
+		//MOEV TO ONE
+		//A > B
+		if (tmp.b != B && tmp.a != 0)
+		{
+			int t = tmp.a - (B - tmp.b);
+			if (t < 0)
+			{
+				second.a = 0;
+				second.b = tmp.b + tmp.a;
+			}
+			else
+			{
+				second.a = t;
+				second.b = B;
+			}
+			second.num = tmp.num + 1;
+			if (!vis[second.a][second.b])
+			{
+				second.path = tmp.path;
+				second.path.push_back("POUR(1,2)");
+				vis[second.a][second.b] = 1;
+				q.push(second);
+			}
+		}
+		//B > A
+		if (tmp.b != 0 && tmp.a != A)
+		{
+			int t = tmp.b - (A - tmp.a);
+			if (t < 0)
+			{
+				second.b = 0;
+				second.a = tmp.a + tmp.b;
+			}
+			else
+			{
+				second.a = A;
+				second.b = t;
+			}
+			second.num = tmp.num + 1;
+			if (!vis[second.a][second.b])
+			{
+				second.path = tmp.path;
+				second.path.push_back("POUR(2,1)");
+				vis[second.a][second.b] = 1;
+				q.push(second);
+			}
+		}
+		//DROP
+		if (tmp.a != 0 && !vis[0][tmp.b])
+		{
+			vis[0][tmp.b] = 1;
+			second.a = 0;
+			second.b = tmp.b;
+			second.path = tmp.path;
+			second.path.push_back("DROP(1)");
+			q.push(second);
+		}
+		if (tmp.b != 0 && !vis[tmp.a][0])
+		{
+			vis[tmp.a][0] = 1;
+			second.a = tmp.a;
+			second.b = 0;
+			second.path = tmp.path;
+			second.path.push_back("DROP(2)");
+			q.push(second);
+		}
+	}
+	return -1;
+}
+
+int main()
+{
+	cin >> A >> B >> C;
+	Node first;
+	first.a = A;
+	first.b = 0;
+	first.num = 0;
+//A_ans.push_back("FILL(1)");
+	vis[A][0] = 1;
+	int ans1 = BFS(first,A_ans);
+	first.a = 0;
+	first.b = B;
+//	B_ans.push_back("FILL(2)");
+	memset(vis, 0, sizeof(vis));
+	vis[0][B] = 1;
+	int ans2 = BFS(first,B_ans);
+	if (ans1 == -1 && ans2 == -1)
+		cout << "impossible";
+	else if (ans2 == -1 || ans1 < ans2)
+	{
+		cout << A_ans.size() + 1 << endl;
+		cout << "FILL(1)" << endl;
+		for (int i = 0; i < A_ans.size(); i++)
+		{
+			for (int k = 0; k < A_ans[i].size(); k++)
+				cout << A_ans[i][k];
+			cout << endl;
+		}
+	}
+	else
+	{
+		cout << B_ans.size() + 1 << endl;
+		cout << "FILL(2)" << endl;
+		for (int i = 0; i < B_ans.size(); i++)
+		{
+			for (int k = 0; k < B_ans[i].size(); k++)
+				cout << B_ans[i][k];
+			cout << endl;
+		}
+	}
+
+	return 0;
+}
