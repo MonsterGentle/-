@@ -1,0 +1,56 @@
+/* poj -3278 */
+/*
+类型：单起点一维BFS
+*/
+#include <iostream>
+#include <queue>
+
+using namespace std;
+
+int s,e;
+int road[200010];
+bool vis[200010];
+
+int BFS()
+{
+	if(s == e)
+		return 0;
+	queue<int> q;
+	q.push(s);
+	vis[s] = 1;
+	while(!q.empty())
+	{
+		int tmp = q.front();
+		q.pop();
+		int tmp1 = tmp + 1;
+		int tmp3 = tmp - 1;
+		int tmp2 = tmp * 2;
+		if( tmp3 >= 0&& !vis[tmp3])
+			{
+				vis[tmp3] = 1;
+				road[tmp3] = road[tmp] + 1;
+				q.push(tmp3);
+			}
+		if(tmp1 <= e && !vis[tmp1])
+			{
+				vis[tmp1] = 1;
+				road[tmp1] = road[tmp] + 1;
+				q.push(tmp1);
+			}
+		if(tmp2 <= 2 * e && !vis[tmp2])
+			{
+				vis[tmp2] = 1;
+				road[tmp2] = road[tmp] + 1;
+				q.push(tmp2);
+			}
+
+	}
+	return road[e];
+}
+
+int main()
+{
+	cin >> s >> e;
+	cout << BFS();
+	return 0;
+}
